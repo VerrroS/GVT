@@ -1,68 +1,112 @@
 <head>
     <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 </head>
 <body>
-<h1>ESA 1 Interaktiv animierte Scheibe</h1>
+<header>
+    <h1>ESA 1 Interaktiv animierte Scheibe</h1>
+    <p>Mit der Taste <strong>r</strong> spielt die Animation vorwärts und mit <strong>l</strong> spielt die Animation rückwärts. Mit der Taste <strong>a</strong> spielt die Animation automatisch so lange bis erneut <strong>a</strong> gedrückt wird. <br>
+    Es kann zwischen zwei Animationen gewählt werden.</p>
+    <form id="anim">
+        <input type="radio" id="turn" name="anim" value="turning" checked>
+        <label for="turn">drehen</label><br>
+        <input type="radio" id="jump" name="anim" value="jumping">
+        <label for="jump">hüpfen</label><br>
+    </form>
+</header>
+<div id="spiteSheet"></div>
+<footer>
+<p>Veronika Simmering - Technische Hochschule Brandenburg</p>
+<hr>
+Credits: <br>
+3D Model von: Raymond Gabriel via Blenderkit <br>
+Material (Scheibe) von: Peter Berghold via Blenderkit
 
-<div id="walkingAnimationImg" >
-
+</footer>
 </body>
 
 <script>
-const walkingAnimationImg = document.getElementById("walkingAnimationImg");
-const width = 2439;
-const height = 859;
+const spiteSheet = document.getElementById("spiteSheet");
+const form = document.getElementById("anim");
+const width = 4000;
+const height = 3000;
 const rows = 3;
 const columns = 4;
 
 let currentPosition = [0, 0]
+var interval;
+var auto = false;
 
 const columnWidth = width/columns;
 const rowHeight = height/rows;
 
-walkingAnimationImg.style.width = columnWidth;
-walkingAnimationImg.style.height = rowHeight;
+spiteSheet.style.width = columnWidth;
+spiteSheet.style.height = rowHeight;
 
-function movePosition(){
-    if (true){
+function movePosition(direction){
+    if (direction){
         currentPosition[0] = currentPosition[0] +1;
         if (currentPosition[0] >= columns){
             currentPosition[0] = 0;
             currentPosition[1] = currentPosition[1] +1
-            if (currentPosition[1] > 1){
+            if (currentPosition[1] >= rows){
                 currentPosition[1] = 0;
             }
 
         }
     }
-    console.log(currentPosition);
+    else {
+        currentPosition[0] = currentPosition[0] -1;
+        if (currentPosition[0] < 0){
+            currentPosition[0] = columns -1;
+            currentPosition[1] = currentPosition[1] -1
+            if (currentPosition[1] < 0){
+                currentPosition[1] = rows -1;
+            }
+
+        }
+    }
+    showPosition();
 }
 
 function showPosition(){
     let x = currentPosition[0] * columnWidth;
-    walkingAnimationImg.style.backgroundPosition =  `-${x}px ${rowHeight}px`
-    console.log(x);
+    let y = currentPosition[1] * rowHeight;
+    spiteSheet.style.backgroundPosition =  `-${x}px -${y}px`
 }
 
 function keyevent(event){
+    
     if (event.key == "a"){
-        for (let i = 0; i < 13; i++){
-            console.log("test")
-            setTimeout(function() {
-            movePosition(true);
-            }, 5000);
+        if(auto == true){
+            clearInterval(interval);
+            auto = false;
+            
         }
-    }
-    if (event.key == "r"){
-        movePosition(true);
-        showPosition();
-    }
+        else{
+            clearInterval(interval);
+            interval = setInterval(movePosition, 100, true);
+            auto = true;
+        }
+        }
 
+    
+    if (event.key == "r"){
+        movePosition(true);   
+    }
+    if (event.key == "l"){
+        movePosition(false);
+    }
+}
+
+
+function changeAnimation(e){
+    spiteSheet.style.backgroundImage = `url(${e.target.value}.png)`;
+    currentPosition = [0, 0];
 }
 
 document.addEventListener('keydown', keyevent)
+anim.addEventListener('change', changeAnimation)
 
 showPosition();
-
-//walkingAnimationImg.style.backgroundPosition 
 </script>
