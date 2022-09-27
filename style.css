@@ -1,0 +1,8 @@
+#walkingAnimationImg {
+    background-image: url(scheibe.png);
+    border: none;
+}
+
+body {
+        background-color: darkgray;
+}

@@ -1,0 +1,68 @@
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>ESA 1 Interaktiv animierte Scheibe</h1>
+
+<div id="walkingAnimationImg" >
+
+</body>
+
+<script>
+const walkingAnimationImg = document.getElementById("walkingAnimationImg");
+const width = 2439;
+const height = 859;
+const rows = 3;
+const columns = 4;
+
+let currentPosition = [0, 0]
+
+const columnWidth = width/columns;
+const rowHeight = height/rows;
+
+walkingAnimationImg.style.width = columnWidth;
+walkingAnimationImg.style.height = rowHeight;
+
+function movePosition(){
+    if (true){
+        currentPosition[0] = currentPosition[0] +1;
+        if (currentPosition[0] >= columns){
+            currentPosition[0] = 0;
+            currentPosition[1] = currentPosition[1] +1
+            if (currentPosition[1] > 1){
+                currentPosition[1] = 0;
+            }
+
+        }
+    }
+    console.log(currentPosition);
+}
+
+function showPosition(){
+    let x = currentPosition[0] * columnWidth;
+    walkingAnimationImg.style.backgroundPosition =  `-${x}px ${rowHeight}px`
+    console.log(x);
+}
+
+function keyevent(event){
+    if (event.key == "a"){
+        for (let i = 0; i < 13; i++){
+            console.log("test")
+            setTimeout(function() {
+            movePosition(true);
+            }, 5000);
+        }
+    }
+    if (event.key == "r"){
+        movePosition(true);
+        showPosition();
+    }
+
+}
+
+document.addEventListener('keydown', keyevent)
+
+showPosition();
+
+//walkingAnimationImg.style.backgroundPosition 
+</script>
