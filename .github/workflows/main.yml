@@ -14,4 +14,4 @@ jobs:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_HOST }}
         password:  ${{ secrets.FTP_PW }}
-        server-dir: "web/animierte-scheibe.veronikasimmering.com/"
+        server-dir: "web/graphical-visualisation-technologies.veronikasimmering.com/"
