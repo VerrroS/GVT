@@ -1,7 +1,9 @@
 #spiteSheet {
-    background-image: url(turning.png);
+    background-image: url(../ESA1/turning.png);
     border: none;
     margin: auto;
+    width: 1000px;
+    height: 1000px;
 }
 
 body {
@@ -17,9 +19,42 @@ form {
 }
 
 header, footer{
-    background-color: #2e2e2e;
+    background-color: #292929;
     color: white;
     text-align: center;
     width: 100%;
     padding: 7px;
+    border-top: black;
+    border-top-style: dashed;
+    border-top-width: 2px;
+}
+
+canvas {
+    margin: auto;
+    display: block;
+    border: solid 5px black;
+}
+
+#info{
+    background-color: #292929;
+    color: white;
+    width: fit-content;
+    margin: auto;
+    padding: 15px;
+    margin-top: 50px;
+}
+
+.bg-dark{
+    background-color: #292929!important;
+}
+
+#github {
+    color:lightgrey;
+    font-size: 30px;
+    text-align: end;
+    display: block;
+}
+
+#github:hover {
+    color:white;
 }
