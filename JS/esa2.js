@@ -67,6 +67,7 @@ var circle3 = makeCircle(12, 0.5, -120);
 var flower = circle1.concat(circle2, circle3);
 
 
+
 function makeLeave (start, height, direction, length){
 	var leave = [];
 	if (direction == 'r'){
@@ -108,4 +109,4 @@ gl.enableVertexAttribArray(posAttrib);
 // Clear framebuffer and render primitives
 gl.clear(gl.COLOR_BUFFER_BIT);
 gl.drawArrays(gl.LINE_STRIP, 0, geo.length/2);
-gl.drawArrays(gl.POINTS, 0, geo.length/2);
+//gl.drawArrays(gl.POINTS, 0, geo.length/2);
