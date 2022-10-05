@@ -1,0 +1,345 @@
+/*jslint devel: true*/
+"use strict";
+
+// ### Start ESA03 - Farbig gefuellte 2D Geometrie
+function calculateAngle(_index, _numVerts, _quandrantDegree, _additionalAngle) {
+    let u = _index / _numVerts;
+    let angle = (u * Math.PI * _quandrantDegree) + _additionalAngle;
+
+    return angle;
+}
+
+function calculatePos(_index, _numVerts, _quandrantDegree, _additionalAngle, _curve, _radius) {
+    let position;
+    let angle = calculateAngle(_index, _numVerts, _quandrantDegree, _additionalAngle);
+
+    _curve == "sin" ?
+        position = Math.sin(angle) * _radius : //Hoehe y
+        position = Math.cos(angle) * _radius; //Breite x
+
+    return position
+}
+
+function uniqueFast(_array) {
+
+    let haveSeen = {},
+        unique = [],
+        indexNumber = [],
+        len = _array.length,
+        count = 0,
+        j = 0;
+    for (let i = 0; i < len; i++) {
+        let item = _array[i];
+        if (haveSeen[item] !== 1) {
+            haveSeen[item] = 1;
+            unique[j++] = _array[i];
+            indexNumber[count] = i;
+            count++;
+        }
+    }
+
+    return { vertices: unique, uniqueIndex: indexNumber };
+}
+
+function merge2DArray(_array) {
+    let arrayMerged2DA = Object.keys(_array).reduce(function(arr, key) {
+        return arr.concat(_array[key]);
+    }, []);
+    return arrayMerged2DA;
+}
+
+let Canvas = (function() {
+
+    function Canvas() {
+
+        // ### End ESA03 - Farbig gefuellte 2D Geometrie
+
+        // Get the WebGL context
+        var canvas = document.getElementById('canvas');
+        var gl = canvas.getContext('experimental-webgl');
+
+        // Pipeline setup
+        // ### Start ESA03 - Farbig gefuellte 2D Geometrie
+        // set canvas background color
+        gl.clearColor(1, 0.95, 0.88, 1);
+        // ### End ESA03 - Farbig gefuellte 2D Geometrie
+
+        // Backface culling.
+        gl.frontFace(gl.CCW);
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.BACK);
+
+        // Compile a vertex shader
+        var vsSource = '' +
+            'attribute vec3 pos;' +
+            'attribute vec4 col;' +
+            'varying vec4 color;' +
+            'void main(){' +
+            'color = col;' +
+            'gl_Position = vec4(pos* 0.5, 1);' +
+            '}';
+        var vs = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(vs, vsSource);
+        gl.compileShader(vs);
+
+        // Compile fragment shader.
+        var fsSouce = 'precision mediump float;' +
+            'varying vec4 color;' +
+            'void main() {' +
+            'gl_FragColor = color;' +
+            '}';
+        var fs = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(fs, fsSouce);
+        gl.compileShader(fs);
+
+        // Link shader together into a program.
+        var prog = gl.createProgram();
+        gl.attachShader(prog, vs);
+        gl.attachShader(prog, fs);
+        gl.linkProgram(prog);
+        gl.useProgram(prog);
+
+        // ### Start ESA03 - Farbig gefuellte 2D Geometrie
+        let circle_degree = 2;
+
+        let quadrant = {
+            one: [1, 1],
+            two: [-1, 1],
+            three: [1, -1],
+            four: [-1, -1],
+        };
+
+        let geom = {
+            drawType: gl.TRIANGLE_FAN,
+            numVerts: {
+                dodekagon: 12,
+                lines: 24,
+                circle: 48,
+                //diamond: 48,
+            },
+            evenFac: 0.3,
+            additionalAngle: {
+                out: Math.sqrt(2) * 360 / 24,
+                in: 0
+            },
+            rad: 0.35,
+            radDodekagon: {
+                lines: 1.75,
+                outer: 1.25,
+                middle: 0.95,
+                inner: 0.65
+            },
+            colorsByType: {
+                lines: {
+                    even: [0.925490, 0.250980, 0.478431, 1],
+                    odd: [0.101960, 0.137254, 0.494117, 1.0],
+                },
+                outer: {
+                    even: [0.549019, 0.6, 0, 1],
+                    odd: [0.803921, 0.862745, 0.223529, 1],
+                },
+                middle: {
+                    even: [0.803921, 0.862745, 0.223529, 1],
+                    odd: [0.6, 0.7, 0, 1],
+                },
+                inner: {
+                    even: [0.6, 0.7, 0, 1],
+                    odd: [1, 1, 0.4, 1],
+                },
+                one: {
+                    even: [1, 0.427450, 0, 1],
+                    odd: [1, 0.619607, 0.250980, 1.0],
+                }
+                /*,
+                                two: {
+                                    even: [1, 0.619607, 0.250980, 1],
+                                    odd: [0.772549, 0.384313, 0, 1],
+                                },
+                                three: {
+                                    even: [0.772549, 0.384313, 0, 1],
+                                    odd: [1, 0.568627, 0, 1],
+                                },
+                                four: {
+                                    even: [1, 0.568627, 0, 1],
+                                    odd: [1, 0.760784, 0.274509, 1],
+                                }*/
+            },
+            colors: [],
+            verticesNumByType: {
+                radLine: 6,
+                diamond: 4,
+                dodekagonPoint: 2
+            },
+            vertices: []
+        };
+
+        this.pushVerticesData = function(_vertices, _cosPos, _sinPos, _verticesNumByType) {
+            _verticesNumByType == geom.verticesNumByType.diamond ?
+                _vertices.push([0, _cosPos, 0], [_sinPos, 0, 0]) :
+                _vertices.push([_cosPos, _sinPos, 0]);
+        }
+
+        let startIndexGeomColors = 0;
+        this.pushColorDataByType = function(_colorsArray, _colorsByType, _verticesLength) {
+            for (let i = startIndexGeomColors; i <= _verticesLength; i++) {
+                if (i % 2 == 0) {
+                    _colorsArray.push(_colorsByType.even); // even-numbered vertices
+                } else {
+                    _colorsArray.push(_colorsByType.odd); // odd-numbered vertices
+                }
+                startIndexGeomColors = i + 1;
+            }
+        };
+
+        this.createCobWeb = function(_vertices, _additionalAngle, _radius, _quadrantFactor, _quandrant, _verticesNumByType, _numVerts) {
+            _vertices.push([0, 0, 0]);
+
+            for (let idx = 0; idx <= _numVerts; idx++) {
+
+                let sinPos = _quandrant[0] * calculatePos(
+                    idx,
+                    _numVerts,
+                    circle_degree / _quadrantFactor,
+                    _additionalAngle,
+                    "sin",
+                    _radius
+                );
+                let cosPos = _quandrant[1] * calculatePos(
+                    idx,
+                    _numVerts,
+                    circle_degree / _quadrantFactor,
+                    _additionalAngle,
+                    "cos",
+                    _radius
+                );
+
+                idx % 2 == 1 && _verticesNumByType == geom.verticesNumByType.radLine ?
+                    this.pushVerticesData(_vertices, geom.evenFac * cosPos, geom.evenFac * sinPos, _verticesNumByType) :
+                    this.pushVerticesData(_vertices, cosPos, sinPos, _verticesNumByType);
+            }
+        }
+
+        // Load vertex data into a buffer
+        // START: Grundgeruest der BLUME
+        for (let idx in geom.radDodekagon) {
+            if (geom.radDodekagon[idx] == geom.radDodekagon.lines)
+                this.createCobWeb(
+                    geom.vertices,
+                    geom.additionalAngle.out,
+                    geom.radDodekagon[idx],
+                    1, quadrant.one,
+                    geom.verticesNumByType.radLine,
+                    geom.numVerts.lines
+                );
+            else this.createCobWeb(
+                geom.vertices,
+                geom.additionalAngle.out,
+                geom.radDodekagon[idx],
+                1, quadrant.one,
+                geom.verticesNumByType.dodekagonPoint,
+                geom.numVerts.dodekagon
+            );
+            this.pushColorDataByType(geom.colors, geom.colorsByType[idx], geom.vertices.length);
+        }
+        // END: Grundgeruest der BLUME
+
+        //START: Zentrum der BLUME
+        this.createCobWeb(
+            geom.vertices,
+            geom.additionalAngle.in,
+            geom.rad,
+            1, quadrant.one,
+            geom.verticesNumByType.dodekagonPoint,
+            geom.numVerts.circle
+        );
+        this.pushColorDataByType(geom.colors, geom.colorsByType.one, geom.vertices.length);
+        //END: Zentrum der BLUME
+
+        // START: Zentrum der Spinnweben
+        // Hier noch Probleme mit Backface-Culling
+        /*for (let idx in quadrant) {
+            this.createCobWeb(
+                geom.vertices,
+                geom.additionalAngle.in,
+                geom.rad,
+                4, quadrant[idx],
+                geom.verticesNumByType.diamond,
+                geom.numVerts.diamond
+            );
+            this.pushColorDataByType(geom.colors, geom.colorsByType[idx], geom.vertices.length);
+        }*/
+        // END: Ende Zentrum der Spinnweben
+
+        // Vertex data.
+        // Positions.
+        let uniqueData2DA = uniqueFast(geom.vertices);
+        let uniqueVertices2DA = uniqueData2DA.vertices;
+        let uniqueVerticesMerged2DA = merge2DArray(uniqueVertices2DA);
+
+        let vertices = new Float32Array(uniqueVerticesMerged2DA.length);
+        for (let idx in uniqueVerticesMerged2DA) {
+            vertices[idx] = uniqueVerticesMerged2DA[idx];
+        }
+
+        // Colors as rgba.
+        let uniqueVerticesColors2DA = [];
+        const uniqueVerticesIdx = uniqueData2DA.uniqueIndex;
+        for (let idx in uniqueVerticesIdx) {
+            uniqueVerticesColors2DA[idx] = geom.colors[uniqueVerticesIdx[idx]];
+        }
+        let uniqueVerticesColorsMerged2DA = merge2DArray(uniqueVerticesColors2DA);
+
+        let colors = new Float32Array(uniqueVerticesColorsMerged2DA.length);
+        for (let idx in uniqueVerticesColorsMerged2DA) {
+            colors[idx] = uniqueVerticesColorsMerged2DA[idx];
+        }
+
+        // Index data.
+        let indices = new Uint16Array(geom.vertices.length);
+        let dataHaveSeen = {};
+        geom.vertices.forEach(function(valueToCompare, idx) {
+            let item = valueToCompare;
+            if (uniqueVertices2DA.indexOf(valueToCompare) != -1) {
+                dataHaveSeen[item] = uniqueVertices2DA.indexOf(valueToCompare);
+                indices[idx] = uniqueVertices2DA.indexOf(valueToCompare);
+            } else {
+                indices[idx] = dataHaveSeen[item];
+            }
+        });
+        // ### END ESA03 - Farbig gefuellte 2D Geometrie
+
+
+        // Setup position vertex buffer object.
+        var vboPos = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vboPos);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+        // Bind vertex buffer to attribute variable.
+        var posAttrib = gl.getAttribLocation(prog, 'pos');
+        gl.vertexAttribPointer(posAttrib, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(posAttrib);
+
+        // Setup color vertex buffer object.
+        var vboCol = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vboCol);
+        gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+        // Bind vertex buffer to attribute variable.
+        var colAttrib = gl.getAttribLocation(prog, 'col');
+        gl.vertexAttribPointer(colAttrib, 4, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(colAttrib);
+
+        // Setup index buffer object.
+        var ibo = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices,
+            gl.STATIC_DRAW);
+        ibo.numerOfEmements = indices.length;
+
+        // Clear framebuffer and render primitives.
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.drawElements(geom.drawType, ibo.numerOfEmements,
+            gl.UNSIGNED_SHORT, 0);
+    }
+    return Canvas;
+}());
+
+new Canvas();
