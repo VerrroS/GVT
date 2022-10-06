@@ -14,9 +14,9 @@ if (!gl) {
 // Pipeline setup.
 gl.clearColor(0, 0,0 , 0.84);
 // Backface culling.
-gl.frontFace(gl.CCW);
-gl.enable(gl.CULL_FACE);
-gl.cullFace(gl.BACK);
+//gl.frontFace(gl.CCW);
+//gl.enable(gl.CULL_FACE);
+//gl.cullFace(gl.BACK);
 //gl.cullFace(gl.FRONT);
 
 // Compile vertex shader.
@@ -26,8 +26,8 @@ var vsSource = ''+
 'varying vec4 color;'+
 'void main(){'+
     'color = col;'+                 
-    'gl_Position = vec4(pos, 1);'+
-'}';
+    'gl_Position = vec4(pos*0.1, 1);'+
+'gl_PointSize = 10.0; }';
 var vs = gl.createShader(gl.VERTEX_SHADER);
 gl.shaderSource(vs, vsSource);
 gl.compileShader(vs);
@@ -54,56 +54,114 @@ function degreeToRadians($degree)
     return $degree * Math.PI / 180;
 }
 
-function makeCircle (parts, radius, offset){
-	vertecies = parts*2;
-	var steps= 360/parts;
-	if(!offset){
-		offset = 0;
-	}
-	var degree = steps + offset;
-	var circle = [];
-	for(let i = 0; i < vertecies; i= i+2){
-		circle[i] = radius*Math.cos(degreeToRadians(degree));
-		circle[i+1] = radius*Math.sin(degreeToRadians(degree))+0.4;
-		degree = degree+steps;
-		
-	}
-    circle.unshift(0+0.4),
-    circle.unshift(0)
-	return circle;
+function joinGeometry(object1, object2){
+    for (let i = 0; i < object1.indices.length; i++){
+        object2.indices.push(object1.indices[i]+ object2.vertices.length/2)
+        //object2.indices[i] = object2.indices[i] + (circle.vertices.length/2);
+        //object2.indices.unshift(object1.indices[i])
+    }
+    object2.vertices = object2.vertices.concat(object1.vertices);
+    object2.color = object2.color.concat(object1.color);
 }
 
-function colorCircle(color1, color2, length){
-    var color = [];
-    color = color.concat(color1);
-    for(let i = 0; i < length; i++){
-        color = color.concat(color2);
+function increaseHue(color, step){
+    for (let i = 0; i < 4; i++){
+        if(color[i] != 0){
+            color[i] = color[i]+ step;
+        }
     }
     return color;
 }
 
-function drawCircle(circle){
-    var indices = [];
-    for(let i = 1; i < circle.length/2; i++){
-        indices.push(0);
-        indices.push(i);
-        indices.push(i+1);
+
+class Circle {
+    constructor(radius, segments, origin) {
+        this.radius = radius;
+        this.segments = segments;
+        this.origin = origin;
+        this.vertices = [];
+        this.indices = [];
+        this.color = [];
+        this.makeVerticies();
+        this.makeInices();
+      }
+    makeVerticies(){
+        var stepSize = 360/this.segments;
+        let degree = stepSize;
+        var iterations = this.segments*2;
+
+        for(let i = 0; i < iterations; i= i+2){
+            this.vertices[i] = this.radius*Math.cos(degreeToRadians(degree))+this.origin[0];
+            this.vertices[i+1] = this.radius*Math.sin(degreeToRadians(degree))+this.origin[1];
+            degree = degree+stepSize;
+            
+        }
+        this.vertices.unshift(0+this.origin[1]);
+        this.vertices.unshift(0+this.origin[0]);
+        return this.vertices;
+        }
+    
+
+    colorize(color1, color2){
+        this.color = this.color.concat(color1);
+        for(let i = 0; i < this.segments; i++){
+            this.color = this.color.concat(color2);
+        }
+        return this.color;
     }
-    indices.push(0);
-    indices.push(indices[-1]);
-    indices.push(indices[1]);
-    return indices;
+
+    makeInices(){
+        for(let i = 1; i < this.vertices.length/2 -1; i++){
+            this.indices.push(0);
+            this.indices.push(i);
+            this.indices.push(i+1);
+        }
+        this.indices.push(0);
+        this.indices.push(this.indices[this.indices.length - 2]);
+        this.indices.push(this.indices[1]);
+        
+        return this.indices;
+    }
 }
 
-var circle = makeCircle(24, 0.5);
+function makeGeomety(steps, startColor1, startColor2){
+    let segments = 4;
+    let radius = 1;
+    let origin = [0,0]
+    var circle = new Circle(radius, segments, origin)
+    circle.colorize(startColor1, startColor2);
+    for (let i = 0; i < steps; i = i+2 ){
+        startColor1 = increaseHue(startColor1, 0.1);
+        startColor2 = increaseHue(startColor2, 0.1);
+        radius = radius + 0.7;
+        origin[0] = origin[0]+1;
+        origin[1] = origin[1]+1;
+        segments = segments*2;
+        var newCircle = new Circle(radius, segments, origin);
+        newCircle.colorize(startColor1, startColor2);
+        var newCircle1 = new Circle(radius, segments,[origin[0]*-1, origin[1]*-1]);
+        newCircle1.colorize(startColor1, startColor2);
+        var newCircle2 = new Circle(radius, segments,[origin[0], origin[1]*-1]);
+        newCircle2.colorize(startColor1, startColor2);
+        var newCircle3 = new Circle(radius, segments,[origin[0]*-1, origin[1]]);
+        newCircle3.colorize(startColor1, startColor2);
+        joinGeometry(circle,newCircle);
+        joinGeometry(newCircle,newCircle1);
+        joinGeometry(newCircle1, newCircle2);
+        joinGeometry(newCircle2, newCircle3);
+        circle = newCircle3;
+    }
+    return circle;
+}
+
+var geo = makeGeomety(8,[1,.1,.1,1], [.1,.1,1,1] );
 
 // Vertex data.
-var vertices = new Float32Array(circle);
+var vertices = new Float32Array(geo.vertices);
 // Index data.
-var indices = new Uint16Array(drawCircle(circle));
-
-
-var colors = new Float32Array(colorCircle([1,0,0,1], [0,1,0,1],24));       
+var indices = new Uint16Array(geo.indices);
+// Color data
+var colors = new Float32Array(geo.color);     
 
 
 
@@ -137,3 +195,5 @@ ibo.numerOfEmements = indices.length;
 gl.clear(gl.COLOR_BUFFER_BIT);
 gl.drawElements(gl.TRIANGLES, ibo.numerOfEmements, 
     gl.UNSIGNED_SHORT, 0);  
+//gl.drawElements(gl.POINTS, ibo.numerOfEmements, 
+    //gl.UNSIGNED_SHORT, 0); 
