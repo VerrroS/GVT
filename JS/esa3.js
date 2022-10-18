@@ -14,9 +14,9 @@ if (!gl) {
 // Pipeline setup.
 gl.clearColor(0, 0,0 , 0.84);
 // Backface culling.
-//gl.frontFace(gl.CCW);
-//gl.enable(gl.CULL_FACE);
-//gl.cullFace(gl.BACK);
+gl.frontFace(gl.CCW);
+gl.enable(gl.CULL_FACE);
+gl.cullFace(gl.BACK);
 //gl.cullFace(gl.FRONT);
 
 // Compile vertex shader.
