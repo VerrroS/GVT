@@ -2,9 +2,56 @@
 {% block main %}
 
 <header>
-    <h1>Parametrisierte FlächenAufgabe</h1>
+    <h1>Parametrisierte Flächen</h1>
 </header>
-        <canvas id="webglcanvas" width="800" height="800" class="mt-2"></canvas>
-        <script src="../JS/esa4.js"></script>
+
+<div class ="row_">
+    <div class="mt-2">
+        <canvas  id="webglcanvas"  width="800" height="800"></canvas>
+    </div>
+
+    <div class="info mt-2">
+        Es kann zwischen Linien und Farb-darstellung gewählt werden.</p>
+        <form id="schema">
+            <input type="radio" id="turn" name="anim" value="linien">
+            <label for="turn">Linien</label><br>
+            <input type="radio" id="jump" name="anim" value="color" checked>
+            <label for="jump">Farbe</label><br>
+        </form>
+
+        Es kann zwischen parametisierten Flächen aus Vorlagen und eigener Prametisierung gewählt werden.</p>
+        <form id="form">
+            <input type="radio" id="turn" name="anim" value="vorlage" checked>
+            <label for="turn">Vorlage</label><br>
+            <input type="radio" id="jump" name="anim" value="eigene">
+            <label for="jump">Eigene</label><br>
+        </form>
+
+        <p>Es wurden folgende Vorlagen von parametisierten Flächen verwendet:</p>
+        <ul>
+            <li>
+                <a href="http://www.3d-meier.de/tut3/Seite175.html" target="_blank">Torusknoten</a>
+            </li>
+            <li>
+                <a href="http://www.3d-meier.de/tut3/Seite58.html" target="_blank">Torus</a>
+            </li>
+        </ul>
+        <p>
+            Die eigene Parametisierung beruht auf folgender Folmel: <br>
+            
+            <p class="ml-4">
+                Die Konstante h bestimmt die Größe der Figur. <br>
+                u ist eine Zahl aus der Zahlenmenge [0, 2 pi] <br>
+                v ist eine Zahl aus Zahlenmenge [0, m]<br>
+                (m ist die Anzahl der Unterteilungen und kann jede positive ganze Zahl sein.)<br><br>
+
+                x = ((h * cos(v)) * sin(u));<br>
+                y = ((R + r * cos(v)) * sin(u))<br>
+                z = 0 <br>
+            </p>
+        </p>
+    </div>
+</div>
+<script src="../JS/esa4.js"></script>
 
 {% endblock %}

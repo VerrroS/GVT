@@ -18,6 +18,12 @@ form {
     font-weight: bold;
 }
 
+.row_{
+    display: flex;
+    justify-content: center;
+    column-gap: 20px;
+}
+
 header, footer{
     background-color: #292929;
     color: white;
@@ -35,13 +41,12 @@ canvas {
     border: solid 5px black;
 }
 
-#info{
+.info{
     background-color: #292929;
     color: white;
     width: fit-content;
-    margin: auto;
     padding: 15px;
-    margin-top: 50px;
+    height: fit-content;
 }
 
 .bg-dark{
@@ -57,4 +62,9 @@ canvas {
 
 #github:hover {
     color:white;
+}
+
+.m_auto{
+    margin-left: auto!important;
+    margin-right: auto!important;
 }
