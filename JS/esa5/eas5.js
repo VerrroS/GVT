@@ -1,4 +1,4 @@
-var app = ( function() {
+var app = (function() {
 
 	var gl;
 
@@ -133,6 +133,7 @@ var app = ( function() {
 		createModel("torus", fs);
 		createModel("cone", fs);
 		createModel("plane", "wireframe");
+		createModel("icosphere", "wireframefill");
 	}
 
 	/**
@@ -143,11 +144,11 @@ var app = ( function() {
 	 */
  function createModel(geometryname, fillstyle) {
 		var model = {};
+
 		model.fillstyle = fillstyle;
 		initDataAndBuffers(model, geometryname);
 		// Create and initialize Model-View-Matrix.
 		model.mvMatrix = mat4.create();
-
 		models.push(model);
 	}
 
@@ -162,6 +163,7 @@ var app = ( function() {
 		// Fill data arrays for Vertex-Positions, Normals, Index data:
 		// vertices, normals, indicesLines, indicesTris;
 		// Pointer this refers to the window.
+
 		this[geometryname]['createVertexData'].apply(model);
 
 		// Setup position vertex buffer object.
@@ -207,7 +209,7 @@ var app = ( function() {
 			//var sign = evt.shiftKey ? -1 : 1;
 			//var key = evt.which ? evt.which : evt.keyCode;
 			var c = evt.key;
-			console.log(c);
+			//console.log(c);
 			// Change projection of scene.
 			switch(c) {
 				case('ArrowRight'):
@@ -218,29 +220,39 @@ var app = ( function() {
 					break;
 				case("ArrowUp"):
 					camera.yAngle -= deltaRotate;
-					console.log("up");
 					break;
 				case("ArrowDown"):
 					camera.yAngle += deltaRotate;
-					console.log("down");
 					break;
-				//case('D'):
-					//camera.distance += sign * deltaTranslate;
-				// case('n'):
-				// 	console.log(sign);
-                //     // Camera fovy in radian.
-                //     camera.fovy += sign * 5 * Math.PI / 180;
-                //     break;
-                // case('B'):
-                //     // Camera near plane dimensions.
-                //     camera.lrtb += sign * 0.1;
-                //     break;
-
+				case('n'):
+					camera.distance -= deltaTranslate;
+                     break;
+				case('N'):
+					camera.distance += deltaTranslate;
+					break;
+				case('a'):
+					camera.center[0] -= deltaTranslate;
+					break;
+				case('d'):
+					camera.center[0] += deltaTranslate;
+					break;
+				case('w'):
+					camera.center[2] -= deltaTranslate;
+					break;
+				case('s'):
+					camera.center[2] += deltaTranslate;
+					break;
 			}
 
 			// Render the scene again on any key pressed.
 			render();
 		};
+		document.getElementById('subdivision').addEventListener('change', () => {
+			document.getElementById("subdivNumb").innerHTML = document.getElementById("subdivision").value;
+			models = [];
+			initModels();
+			render();
+		  });
 	}
 
 	/**
@@ -319,6 +331,7 @@ var app = ( function() {
 			gl.drawElements(gl.LINES, model.iboLines.numberOfElements,
 				gl.UNSIGNED_SHORT, 0);
 		}
+
 	}
 
 	// App interface.
@@ -342,5 +355,4 @@ var app = ( function() {
 }
 
 }());
-
 

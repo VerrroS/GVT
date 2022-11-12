@@ -20,7 +20,7 @@ var cone = ( function() {
 		var dv = 1 / m;
 		var h = 1;
 
-        var offsetX = 1;
+        var offsetX = 2;
         var offsetY = 0; 
         var offsetZ = 0; 
 

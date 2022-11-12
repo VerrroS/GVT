@@ -39,15 +39,24 @@ onload="app.start()"
 
 {% block main %}
 	<header>
-		<h1>Farbig gefüllte 2D Geometrie</h1>
+		<h1>Kamerabewegung</h1>
 	</header>
 <div class ="row_">
 	<div class="mt-2">
 		<canvas id="canvas" width="800" height="800"></canvas>
 	</div>
 	<div class="info mt-2">
-		<p>test</p>
+		<p>Anzahl der Subdivisions <strong id="subdivNumb">0</strong></p>
+		<form>
+			<input id="subdivision" type="range" value="0" min="0" max="5" step="1" class="slider"></input>
+		</form>
+		<p>
+			Über die <strong>Pfeiltasten</strong> lässt sich der Kamerawinkel ändern. <br>
+			Mittels der <strong>Taste N (und Shift-N)</strong> kann man den Radius der Bewegung verändern. <br>
+			Zusätzlich lässt sich die Kamera über die <strong>Tasten WASD </strong> in XY-Richtung bewegen.
+		</p>
 	</div>
 
 </div>
+
 {% endblock %}

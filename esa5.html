@@ -64,7 +64,7 @@ onload="app.start()"
                 <a class="nav-link" href="/esa4.html">ESA4</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link " href="/esa5.html">ESA5</a>
+                <a class="nav-link" href="/esa5.html">ESA5</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link disabled" href="/esa6.html">ESA6</a>
@@ -91,17 +91,26 @@ onload="app.start()"
 <main>
      
 	<header>
-		<h1>Farbig gefüllte 2D Geometrie</h1>
+		<h1>Kamerabewegung</h1>
 	</header>
 <div class ="row_">
 	<div class="mt-2">
 		<canvas id="canvas" width="800" height="800"></canvas>
 	</div>
 	<div class="info mt-2">
-		<p>test</p>
+		<p>Anzahl der Subdivisions <strong id="subdivNumb">0</strong></p>
+		<form>
+			<input id="subdivision" type="range" value="0" min="0" max="5" step="1" class="slider"></input>
+		</form>
+		<p>
+			Über die <strong>Pfeiltasten</strong> lässt sich der Kamerawinkel ändern. <br>
+			Mittels der <strong>Taste N (und Shift-N)</strong> kann man den Radius der Bewegung verändern. <br>
+			Zusätzlich lässt sich die Kamera über die <strong>Tasten WASD </strong> in XY-Richtung bewegen.
+		</p>
 	</div>
 
 </div>
+
 
 </main>
 

@@ -24,6 +24,10 @@ var torus = ( function() {
 		var iLines = 0;
 		var iTris = 0;
 
+		var offsetX = -2;
+        var offsetY = 0; 
+        var offsetZ = 0; 
+
 		// Loop angle u.
 		for(var i = 0, u = 0; i <= n; i++, u += du) {
 			// Loop angle v.
@@ -31,7 +35,7 @@ var torus = ( function() {
 
 				var iVertex = i * (m + 1) + j;
 
-				var x = (R + r * Math.cos(u) ) * Math.cos(v);
+				var x = (R + r * Math.cos(u) ) * Math.cos(v) + offsetX;
 				var y = (R + r * Math.cos(u) ) * Math.sin(v);
 				var z = r * Math.sin(u);
 
