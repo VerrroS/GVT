@@ -133,13 +133,13 @@ var app = ( function() {
 	function initModels() {
 		// fillstyle
 		var fs = "fillwireframe";
-		createModel("torus", fs, [ 1, 1, 1, 1 ], [ 0, 0, 0 ], [ 0, 0, 0 ], [
-			1, 1, 1 ]);
+		var f = "fill";
+		createModel("torus", f, [ 0.6, 0, 0.4, 1 ], [ 0, 0, 2 ], [ 0, Math.PI / 2 , 0 ], [1, 1, 1 ]);
 		createModel("plane", "wireframe", [ 1, 1, 1, 1 ], [ 0, -.8, 0 ], [0, 0, 0 ], [ 1, 1, 1 ]);
-		createModel("sphere", fs, [ 0, 1, 1, 1 ], [ 1, -.3, -1 ],[ 0, 0, 0 ], [ .2, .2, .2 ]);
-		createModel("sphere", fs, [ 1, 0, 1, 1 ], [ -1, -.3, -1 ],[ 0, 0, 0 ], [ .2, .2, .2 ]);
-		createModel("sphere", fs, [ 0, 0, 1, 1 ], [ 1, -.3, 1 ],[ 0, 0, 0 ], [ .2, .2, .2 ]);
-		createModel("sphere", fs, [ 1, 1, 0, 1 ], [ -1, -.3, 1 ],[ 0, 0, 0 ], [ .2, .2, .2 ]);
+		createModel("sphere", f, [ 0, 0, .8, 1 ], [ -2, 0, 0 ],[ 0, 0, 0 ], [ .2, .2, .2 ]);
+		createModel("sphere", f, [ 0, 0, .8, 1 ], [ 0, 0, -2 ],[ 0, 0, 0 ], [ .2, .2, .2 ]);
+		createModel("sphere", f, [ 0, 0, .8, 1 ], [ 2, 0, 0 ],[ 0, 0, 0 ], [ .2, .2, .2 ]);
+		createModel("sphere", f, [ 0, 0, .8, 1 ], [ 0, 0, 2 ],[ 0, 0, 0 ], [ .2, .2, .2 ]);
 
 		// Select one model that can be manipulated interactively by user.
 		interactiveModel = models[0];
@@ -175,6 +175,7 @@ var app = ( function() {
 
 		// Create and initialize Model-View-Matrix.
 		model.mvMatrix = mat4.create();
+
 	}
 
 	/**
@@ -224,48 +225,42 @@ var app = ( function() {
 	}
 
 	function initEventHandler() {
-		// Rotation step.
-		var deltaRotate = Math.PI / 36;
-		var angleRotate = Math.PI / 36;
-		var r = 1;
+		// Rotation step Torus.
+		var deltaRotate = 2*Math.PI / 36;
+		// Rotation step spheres
+		var transformAngle = Math.PI / 36;
+		var r = 2;
+
+		function animate (){
+			// Rotate Torus
+			models[0].rotate[1] += deltaRotate;
+			//Rotate Spheres
+			for (let i = 2; i< 6; i++){
+				models[i].translate[2] = Math.cos(transformAngle) * r;
+				models[i].translate[0] = Math.sin(transformAngle) * r;
+				if (i == 5) {
+					transformAngle += Math.PI / 36;
+				} else {
+					transformAngle += Math.PI/2;
+				}
+			}
+		}
 
 		window.onkeydown = function(evt) {
 			var key = evt.which ? evt.which : evt.keyCode;
 			var c = String.fromCharCode(key);
-			// console.log(evt);
 			// Use shift key to change sign.
 			var sign = evt.shiftKey ? -1 : 1;
-
 			// Change projection of scene.
-			switch(c) {
-                case('X'):
-                    interactiveModel.rotate[0] += sign * deltaRotate;
-                    break;
-                case('Y'):
-                    interactiveModel.rotate[1] += sign * deltaRotate;
-                    break;
-                case('Z'):
-                    interactiveModel.rotate[2] += sign * deltaRotate;
-                    break;
-            }
 			switch(c){
 				case('K'):
-					models[0].rotate[0] += deltaRotate;
-					for (let i = 2; i< 6; i++){
-						models[i].translate[0] = Math.cos(angleRotate) * r;
-						models[i].translate[2] = Math.sin(angleRotate) * r;
-						//models[i].rotate[1] += 2 * deltaRotate;
-						if (i == 5) {
-							angleRotate += Math.PI / 36;
-						} else {
-							angleRotate += Math.PI/24;
-						}
-					}
+					animate(false);
 			}
 			// Render the scene again on any key pressed.
 			render();
 		};
 	}
+
 
 	/**
 	 * Run the rendering pipeline.
