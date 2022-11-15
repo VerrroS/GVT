@@ -7,9 +7,44 @@
     <link href="style.css" rel="stylesheet">
     <script src="https://code.iconify.design/2/2.1.0/iconify.min.js"></script>
     
+	<script src="../JS/esa6/ext/gl-matrix.js"></script>
+	<script src="../JS/esa6/GVT_Src_vertexData_sphere.js"></script>
+	<script src="../JS/esa6/GVT_Src_vertexData_torus.js"></script>
+	<script src="../JS/esa6/GVT_Src_vertexData_plane.js"></script>
+    <script src="../JS/esa6/esa6.js"></script>
+	<script type="x-shader/x-vertex" id="vertexshader">
+		attribute vec3 aPosition;
+		attribute vec3 aNormal;
+
+		uniform mat4 uPMatrix;
+		uniform mat4 uMVMatrix;
+		uniform vec4 uColor;
+		uniform mat3 uNMatrix;
+
+		varying vec4 vColor;
+
+		void main(){
+			gl_Position = uPMatrix * uMVMatrix * vec4(aPosition, 1.0);
+			vColor = vec4(aNormal.z, aNormal.z, aNormal.z, 1.0);
+			vec3 tNormal = uNMatrix * aNormal;
+			vColor = vec4(tNormal.z, tNormal.z, tNormal.z, 1.0);
+			vColor = uColor * (vColor + 1.0) / 2.0;
+		}
+	</script>
+	<script type="x-shader/x-fragment" id="fragmentshader">
+		precision mediump float;
+		varying vec4 vColor;
+
+		void main() {
+			gl_FragColor = vColor;
+		}
+	</script>
+
     <title>Veronika Simmering</title>
 </head>
-<body  >
+<body  
+onload="app.start()"
+>
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="/">Veronika Simmering</a>
@@ -57,12 +92,19 @@
 
 <main>
      
+	<header>
+		<h1>Objekte bewegen - fliegende Kugeln</h1>
+	</header>
+<div class ="row_">
+	<div class="mt-2">
+		<canvas id="canvas" width="800" height="800"></canvas>
+	</div>
+	<div class="info mt-2">
+        test
+	</div>
 
-<header>
-    <h1>2D Geometrie aus Linien</h1>
-</header>
-        <canvas id="webglcanvas" width="800" height="800" class="mt-2"></canvas>
-        <script src="../JS/esa2.js"></script>
+</div>
+
 
 </main>
 

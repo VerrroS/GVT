@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block head %}
+	<script src="../JS/esa6/ext/gl-matrix.js"></script>
+	<script src="../JS/esa6/GVT_Src_vertexData_sphere.js"></script>
+	<script src="../JS/esa6/GVT_Src_vertexData_torus.js"></script>
+	<script src="../JS/esa6/GVT_Src_vertexData_plane.js"></script>
+    <script src="../JS/esa6/esa6.js"></script>
+	<script type="x-shader/x-vertex" id="vertexshader">
+		attribute vec3 aPosition;
+		attribute vec3 aNormal;
+
+		uniform mat4 uPMatrix;
+		uniform mat4 uMVMatrix;
+		uniform vec4 uColor;
+		uniform mat3 uNMatrix;
+
+		varying vec4 vColor;
+
+		void main(){
+			gl_Position = uPMatrix * uMVMatrix * vec4(aPosition, 1.0);
+			vColor = vec4(aNormal.z, aNormal.z, aNormal.z, 1.0);
+			vec3 tNormal = uNMatrix * aNormal;
+			vColor = vec4(tNormal.z, tNormal.z, tNormal.z, 1.0);
+			vColor = uColor * (vColor + 1.0) / 2.0;
+		}
+	</script>
+	<script type="x-shader/x-fragment" id="fragmentshader">
+		precision mediump float;
+		varying vec4 vColor;
+
+		void main() {
+			gl_FragColor = vColor;
+		}
+	</script>
+{% endblock %}
+
+{% block onload %}
+onload="app.start()"
+{% endblock %}
+
+{% block main %}
+	<header>
+		<h1>Objekte bewegen - fliegende Kugeln</h1>
+	</header>
+<div class ="row_">
+	<div class="mt-2">
+		<canvas id="canvas" width="800" height="800"></canvas>
+	</div>
+	<div class="info mt-2">
+        test
+	</div>
+
+</div>
+
+{% endblock %}
