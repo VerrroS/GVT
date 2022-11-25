@@ -7,9 +7,45 @@
     <link href="style.css" rel="stylesheet">
     <script src="https://code.iconify.design/2/2.1.0/iconify.min.js"></script>
     
+	<script src="../JS/esa7/ext/gl-matrix.js"></script>
+	<script src="../JS/esa7/GVT_Src_vertexData_sphere.js"></script>
+	<script src="../JS/esa7/GVT_Src_vertexData_torus.js"></script>
+	<script src="../JS/esa7/GVT_Src_vertexData_plane.js"></script>
+    <script src="../JS/esa7/esa7.js"></script>
+	<script type="x-shader/x-vertex" id="vertexshader">
+
+		attribute vec3 aPosition;
+		attribute vec3 aNormal;
+
+		uniform mat4 uPMatrix;
+		uniform mat4 uMVMatrix;
+
+		varying vec4 vColor;
+
+		void main(){
+		gl_Position = uPMatrix * uMVMatrix * vec4(aPosition, 1.0);
+
+		vColor = vec4(aNormal.x, aNormal.y, aNormal.z, 1.0);
+		}
+	
+	</script>
+	<script type="x-shader/x-fragment" id="fragmentshader">
+
+		precision mediump float;
+		varying vec4 vColor;
+
+		void main() {
+		float zbuffer = gl_FragCoord.z;
+			gl_FragColor = vec4(zbuffer, zbuffer, zbuffer, 1);
+		}
+	
+	</script>
+
     <title>Veronika Simmering</title>
 </head>
-<body  >
+<body  
+onload="app.start()"
+>
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="/">Veronika Simmering</a>
@@ -57,32 +93,18 @@
 
 <main>
      
+	<header>
+		<h1>Z-Buffer Visualisierung</h1>
+	</header>
+<div class ="row_">
+	<div class="mt-2">
+		<canvas id="canvas" width="800" height="800"></canvas>
+	</div>
+	<div class="info mt-2">
+        Kamera Bewegung über WASD
+	</div>
 
-<header>
-    <h1>ESA 1 Interaktiv animierte Scheibe</h1>
-</header>
-
-<div id="spiteSheet"></div>
-
-
-<footer>
-    <p>Mit der Taste <strong>r</strong> spielt die Animation vorwärts und mit <strong>l</strong> spielt die Animation rückwärts. Mit der Taste <strong>a</strong> spielt die Animation automatisch so lange bis erneut <strong>a</strong> gedrückt wird. <br>
-        Es kann zwischen zwei Animationen gewählt werden.</p>
-        <form id="anim">
-            <input type="radio" id="turn" name="anim" value="turning" checked>
-            <label for="turn">drehen</label><br>
-            <input type="radio" id="jump" name="anim" value="jumping">
-            <label for="jump">hüpfen</label><br>
-        </form>
-<p>Veronika Simmering - Technische Hochschule Brandenburg</p>
-<hr>
-Credits: <br>
-3D Model von: Raymond Gabriel via Blenderkit <br>
-Material (Scheibe) von: Peter Berghold via Blenderkit
-
-</footer>
-
-<script src="../JS/esa1.js"></script>
+</div>
 
 
 </main>

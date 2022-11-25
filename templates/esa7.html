@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block head %}
+	<script src="../JS/esa7/ext/gl-matrix.js"></script>
+	<script src="../JS/esa7/GVT_Src_vertexData_sphere.js"></script>
+	<script src="../JS/esa7/GVT_Src_vertexData_torus.js"></script>
+	<script src="../JS/esa7/GVT_Src_vertexData_plane.js"></script>
+    <script src="../JS/esa7/esa7.js"></script>
+	<script type="x-shader/x-vertex" id="vertexshader">
+
+		attribute vec3 aPosition;
+		attribute vec3 aNormal;
+
+		uniform mat4 uPMatrix;
+		uniform mat4 uMVMatrix;
+
+		varying vec4 vColor;
+
+		void main(){
+		gl_Position = uPMatrix * uMVMatrix * vec4(aPosition, 1.0);
+
+		vColor = vec4(aNormal.x, aNormal.y, aNormal.z, 1.0);
+		}
+	
+	</script>
+	<script type="x-shader/x-fragment" id="fragmentshader">
+
+		precision mediump float;
+		varying vec4 vColor;
+
+		void main() {
+		float zbuffer = gl_FragCoord.z;
+			gl_FragColor = vec4(zbuffer, zbuffer, zbuffer, 1);
+		}
+	
+	</script>
+{% endblock %}
+
+{% block onload %}
+onload="app.start()"
+{% endblock %}
+
+{% block main %}
+	<header>
+		<h1>Z-Buffer Visualisierung</h1>
+	</header>
+<div class ="row_">
+	<div class="mt-2">
+		<canvas id="canvas" width="800" height="800"></canvas>
+	</div>
+	<div class="info mt-2">
+        Kamera Bewegung über WASD
+	</div>
+
+</div>
+
+{% endblock %}
