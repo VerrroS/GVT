@@ -1,0 +1,148 @@
+{% extends "layout.html" %}
+
+{% block head %}
+	<script src="../JS/esa8/ext/gl-matrix.js"></script>
+	<script src="../JS/esa8/GVT_Src_vertexData_sphere.js"></script>
+	<script src="../JS/esa8/GVT_Src_vertexData_torus.js"></script>
+	<script src="../JS/esa8/GVT_Src_vertexData_plane.js"></script>
+	<script src="../JS/esa8/esa8.js"></script>
+    <script type="x-shader/x-vertex" id="vertexshader">
+		attribute vec3 aPosition;
+			attribute vec3 aNormal;
+
+			uniform mat4 uPMatrix;
+			uniform mat4 uMVMatrix;
+			uniform mat3 uNMatrix;
+
+			varying vec3 vNormal;
+			varying vec4 vPosition;
+
+			void main(){
+				vec4 tPosition = uMVMatrix * vec4(aPosition, 1.0);
+				gl_Position = uPMatrix * tPosition;
+
+				vec3 tNormal = normalize(uNMatrix * aNormal);
+
+				vPosition = tPosition;
+				vNormal = tNormal;
+			}
+	</script>
+	<script type="x-shader/x-fragment" id="fragmentshader">
+		precision mediump float;
+
+			varying vec3 vNormal;
+			varying vec4 vPosition;
+			
+			// Material.
+			struct toonMaterial {
+				vec3 ka;
+				vec3 kd;
+				vec3 ks;
+				float ke;
+			};
+			uniform toonMaterial material;
+
+			// Ambient light.
+			uniform vec3 ambientLight;
+
+			// Pointlights.
+			const int MAX_LIGHT_SOURCES = 8;
+			struct LightSource {
+				bool isOn;
+				vec3 position;
+				vec3 color;
+			};
+			uniform LightSource light[MAX_LIGHT_SOURCES];
+
+			// toon illumination for single light source,
+			// no ambient light.
+			vec3 toon(vec3 p, vec3 n, vec3 v, LightSource light) {
+
+				vec3 L = light.color;
+
+				vec3 s = normalize(light.position - p);
+				vec3 r = reflect(-s, n);
+
+                float sn = max( dot(s,n), 0.0);
+				float rv = max( dot(r,v), 0.0);
+
+				float intensity = max( sn, 0.0);
+		
+				
+				if (intensity > 0.9)
+					intensity = 1.0;
+
+				else if (intensity > 0.7)
+					intensity = 0.7;
+	
+				else if (intensity > 0.5)
+					intensity = 0.5;
+	
+				else if (intensity > 0.3)
+					intensity = 0.3;
+		
+				else if (intensity > 0.1)
+					intensity = 0.1;
+
+				else {
+					intensity = 0.0;
+				}
+
+				if (sn > 0.0 && rv > 0.8 ) {
+					rv = 0.85;
+				}
+		
+
+				vec3 diffuse = material.kd * L* intensity;
+
+
+				return diffuse;
+			}
+
+			// toon illumination for multiple light sources
+			vec3 toon(vec3 p, vec3 n, vec3 v) {
+
+				// Calculate ambient light.
+				vec3 result = material.ka * ambientLight;
+
+				// Add light from all light sources.
+				for(int j=0; j < MAX_LIGHT_SOURCES; j++){ 
+					if(light[j].isOn){ 
+						result +=toon(p, n, v, light[j]); 
+					} 
+				} 
+				return result; 
+			}
+
+			void main() {
+				// Calculate view vector.
+				vec3 v = normalize(-vPosition.xyz);
+
+				vec3 vNormal = normalize(vNormal);
+
+				gl_FragColor = vec4( toon(vPosition.xyz, vNormal, v), 1.0);
+			}
+	</script>
+{% endblock %}
+
+{% block onload %}
+onload="app.start()"
+{% endblock %}
+
+{% block main %}
+	<header>
+		<h1>Lichter auf Kreisbahn mit Toon Shading</h1>
+	</header>
+	<div class ="row_">
+		<div class="mt-2">
+			<canvas id="canvas" width="800" height="800"></canvas>
+		</div>
+		<div class="info mt-2">
+			Taste I um die Lichter in Richtung Urzeigersinn zu drehen.<br>
+			Taste L um die Lichter gegen den Urzeigersinn zu drehen.<br>
+			<a href="/esa8.html"><button >Gouraud-Shading</button></a>
+		</div>
+	
+	</div>
+
+{% endblock %}
