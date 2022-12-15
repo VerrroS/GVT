@@ -43,13 +43,13 @@ var app = (function() {
         ambientLight : [ .5, .5, .5 ],
         light : [ {
             isOn : true,
-            position : [ 3., .5, 0. ],
+            position : [ 0., .5, 3. ],
             color : [ 1., .2, .2]
         },
         // Second light source.
         {
             isOn : true,
-            position : [ -3., .5, 0. ],
+            position : [ 0., .5, -3. ],
             color : [ .2, .2, 1. ]
         } ]
     };
